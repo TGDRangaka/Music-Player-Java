@@ -1,21 +1,24 @@
 package lk.ijse.musicplayerjava;
 
 
+import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -27,12 +30,28 @@ import java.util.stream.Stream;
 public class PlayerViewController implements Initializable {
 
     @FXML
+    private Slider slider;
+
+    @FXML
+    private Label currentTimeLbl;
+
+    @FXML
+    private Label totDurationLbl;
+
+    @FXML
+    private ImageView playPauseImg;
+
+    @FXML
     private ScrollPane listScrollPane;
 
     @FXML
     private VBox listVBox;
+
     @FXML
-    private ImageView playPauseImg;
+    private Label songNameLabel;
+
+    @FXML
+    private ImageView discImg;
 
     private Media media;
     private MediaPlayer mediaPlayer;
@@ -43,6 +62,8 @@ public class PlayerViewController implements Initializable {
     private int index = -1;
     private List<String> audioPaths = new ArrayList<>();
     private List<Button> audioListBtns = new ArrayList<>();
+    private Duration totDuration;
+    private RotateTransition rotateTransition;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -51,47 +72,53 @@ public class PlayerViewController implements Initializable {
         fileChooser.setInitialDirectory(new File(lastChooserLocation));
         FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Audio Files",  "*.mp3", "*.wav", "*.ogg");
         fileChooser.getExtensionFilters().add(filter);
+
+        rotateTransition = new RotateTransition(Duration.seconds(30), discImg);
+        rotateTransition.setByAngle(360);
+        rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
     }
 
     @FXML
     void nextBtnOnAction(ActionEvent event) {
+        if(audioPaths.size() < 1){
+            new Alert(Alert.AlertType.WARNING, "No Playlist to be found").show();
+            return;
+        }
         if(++index  >= audioPaths.size()){
             index = 0;
         }
-        if(isPlayed){
-            mediaPlayer.stop();
-            isPlayed = false;
-        }
-        media = new Media(audioPaths.get(index));
-        mediaPlayer = new MediaPlayer(media);
-        playBtnOnAction(new ActionEvent());
+        setAudioToPlayer(audioPaths.get(index));
     }
 
     @FXML
     void playBtnOnAction(ActionEvent event) {
+        if(mediaPlayer == null){
+            new Alert(Alert.AlertType.WARNING, "No Audio to be found").show();
+            return;
+        }
         if(isPlayed){
             mediaPlayer.pause();
             playPauseImg.setImage(new Image(getClass().getResource("/img/play.png").toExternalForm()));
+            rotateTransition.pause();
             isPlayed = false;
         }else{
             mediaPlayer.play();
             playPauseImg.setImage(new Image(getClass().getResource("/img/pause.png").toExternalForm()));
+            rotateTransition.play();
             isPlayed = true;
         }
     }
 
     @FXML
     void prevBtnOnAction(ActionEvent event) {
+        if(audioPaths.size() < 1){
+            new Alert(Alert.AlertType.WARNING, "No Playlist to be found").show();
+            return;
+        }
         if(--index  <= -1){
             index = audioPaths.size() - 1;
         }
-        if(isPlayed){
-            mediaPlayer.stop();
-            isPlayed = false;
-        }
-        media = new Media(audioPaths.get(index));
-        mediaPlayer = new MediaPlayer(media);
-        playBtnOnAction(new ActionEvent());
+        setAudioToPlayer(audioPaths.get(index));
     }
 
     @FXML
@@ -100,21 +127,12 @@ public class PlayerViewController implements Initializable {
             File selectedFile = fileChooser.showOpenDialog(null);
 
             if (selectedFile != null) {
-                if(isPlayed){
-                    mediaPlayer.stop();
-                    isPlayed = false;
-                }
                 String url = selectedFile.toURI().toString();
 
+                setAudioToPlayer(url);
+
                 setLastChooserLocation(url);
-
-                media = new Media(url);
-                mediaPlayer = new MediaPlayer(media);
-
-                playBtnOnAction(new ActionEvent());
-
                 readAllItemsInFolder(lastChooserLocation);
-
                 setList();
             }
         }catch (Exception e){
@@ -123,8 +141,56 @@ public class PlayerViewController implements Initializable {
     }
 
     @FXML
+    void sliderOnMousePressed(MouseEvent event) {
+        mediaPlayer.seek(Duration.seconds(slider.getValue()));
+    }
+
+    @FXML
+    void sliderOnMouseDragged(MouseEvent event) {
+        mediaPlayer.seek(Duration.seconds(slider.getValue()));
+    }
+
+    @FXML
     void listBtnOnAction(ActionEvent event) {
         listScrollPane.setVisible(!listScrollPane.isVisible());
+    }
+
+    private void setAudioToPlayer(String url){
+        if(isPlayed){
+            mediaPlayer.stop();
+            isPlayed = false;
+        }
+        setAudioName(url);
+
+        media = new Media(url);
+        mediaPlayer = new MediaPlayer(media);
+
+        mediaPlayer.setOnEndOfMedia(() -> {
+            nextBtnOnAction(new ActionEvent());
+        });
+
+        mediaPlayer.setOnReady(() -> {
+            totDuration = media.getDuration();
+            slider.setMax(totDuration.toSeconds());
+            int minutes = (int) totDuration.toSeconds() / 60;
+            int seconds = (int) totDuration.toSeconds() % 60;
+            totDurationLbl.setText(String.format("%02d:%02d", minutes, seconds));
+        });
+
+        mediaPlayer.currentTimeProperty().addListener((observableValue, oldValue, newValue) -> {
+            slider.setValue(newValue.toSeconds());
+            int minutes = (int) newValue.toSeconds() / 60;
+            int seconds = (int) newValue.toSeconds() % 60;
+            currentTimeLbl.setText(String.format("%02d:%02d", minutes, seconds));
+        });
+
+
+        playBtnOnAction(new ActionEvent());
+    }
+
+    private void setAudioName(String url){
+        String[] split = url.split("/");
+        songNameLabel.setText(split[split.length - 1].replace("%20", " "));
     }
 
     private void setList(){
@@ -136,13 +202,7 @@ public class PlayerViewController implements Initializable {
 
             final int indx = i;
             btn.setOnAction(e -> {
-                if(isPlayed){
-                    mediaPlayer.stop();
-                    isPlayed = false;
-                }
-                media = new Media(audioPaths.get(indx));
-                mediaPlayer = new MediaPlayer(media);
-                playBtnOnAction(new ActionEvent());
+                setAudioToPlayer(audioPaths.get(indx));
                 listBtnOnAction(new ActionEvent());
             });
 
@@ -171,12 +231,12 @@ public class PlayerViewController implements Initializable {
         urlSplit[0] = "";
         urlSplit[urlSplit.length - 1] = "";
         String newLocation = String.join("/",new ArrayList<>(Arrays.asList(urlSplit))).substring(1);
-        if(!newLocation.equals(lastChooserLocation)){
-            audioPaths.clear();
-            audioListBtns.clear();
-            listVBox.getChildren().clear();
-            index = 0;
-        }
+
+        audioPaths.clear();
+        audioListBtns.clear();
+        listVBox.getChildren().clear();
+        index = 0;
+
         lastChooserLocation = String.join("/",new ArrayList<>(Arrays.asList(urlSplit))).substring(1);
         fileChooser.setInitialDirectory(new File(lastChooserLocation));
     }

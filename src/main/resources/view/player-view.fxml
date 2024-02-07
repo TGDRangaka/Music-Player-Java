@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.image.Image?>
@@ -11,19 +12,46 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="652.0" prefWidth="400.0" style="-fx-background-color: gold;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.musicplayerjava.PlayerViewController">
+<AnchorPane prefHeight="652.0" prefWidth="400.0" style="-fx-background-color: linear-gradient(to right, #a8ff78, #78ffd6);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.musicplayerjava.PlayerViewController">
    <children>
+      <ImageView fx:id="discImg" fitHeight="308.0" fitWidth="250.0" layoutX="75.0" layoutY="114.0" AnchorPane.topAnchor="139.0">
+         <image>
+            <Image url="@../img/disc.png" />
+         </image>
+      </ImageView>
       <BorderPane prefHeight="652.0" prefWidth="400.0">
          <bottom>
-            <VBox alignment="CENTER" prefHeight="139.0" prefWidth="771.0" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" prefHeight="152.0" prefWidth="400.0" BorderPane.alignment="CENTER">
                <children>
-                  <Slider prefHeight="14.0" prefWidth="354.0">
+                  <Label fx:id="songNameLabel" alignment="CENTER" prefHeight="28.0" prefWidth="384.0">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Slider fx:id="slider" onMouseDragged="#sliderOnMouseDragged" onMousePressed="#sliderOnMousePressed" prefHeight="14.0" prefWidth="383.0" stylesheets="@../styles/slider-style.css">
                      <padding>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                      </padding>
                   </Slider>
-                  <JFXButton onAction="#selectMediaBtnOnAction" prefHeight="27.0" prefWidth="90.0" style="-fx-border-color: black; -fx-border-radius: 8;" text="Select Media" />
+                  <Pane prefHeight="59.0" prefWidth="400.0">
+                     <children>
+                        <Label fx:id="currentTimeLbl" layoutX="11.0" layoutY="3.0" prefHeight="17.0" prefWidth="129.0" text="00:00">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="totDurationLbl" alignment="CENTER_RIGHT" layoutX="270.0" layoutY="2.0" prefHeight="17.0" prefWidth="120.0" text="00:00">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </Pane>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="411.0">
                      <children>
                         <JFXButton contentDisplay="GRAPHIC_ONLY" onAction="#prevBtnOnAction">
@@ -37,12 +65,12 @@
                         </JFXButton>
                         <Pane prefHeight="64.0" prefWidth="68.0">
                            <children>
-                              <ImageView fx:id="playPauseImg" fitHeight="34.0" fitWidth="34.0" layoutX="17.0" layoutY="22.0" preserveRatio="true">
+                              <ImageView fx:id="playPauseImg" fitHeight="34.0" fitWidth="34.0" layoutX="17.0" layoutY="19.0" preserveRatio="true">
                                  <image>
                                     <Image url="@../img/play.png" />
                                  </image>
                               </ImageView>
-                              <JFXButton contentDisplay="GRAPHIC_ONLY" layoutX="8.0" layoutY="14.0" onAction="#playBtnOnAction" prefHeight="51.0" prefWidth="52.0" />
+                              <JFXButton contentDisplay="GRAPHIC_ONLY" layoutX="9.0" layoutY="9.0" onAction="#playBtnOnAction" prefHeight="51.0" prefWidth="52.0" />
                            </children>
                         </Pane>
                         <JFXButton contentDisplay="GRAPHIC_ONLY" onAction="#nextBtnOnAction">
@@ -60,7 +88,7 @@
             </VBox>
          </bottom>
          <top>
-            <Pane prefHeight="52.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+            <Pane prefHeight="75.0" prefWidth="400.0" BorderPane.alignment="CENTER">
                <children>
                   <JFXButton contentDisplay="GRAPHIC_ONLY" layoutX="14.0" layoutY="9.0" onAction="#listBtnOnAction" text="List">
                      <graphic>
@@ -71,6 +99,12 @@
                         </ImageView>
                      </graphic>
                   </JFXButton>
+                  <JFXButton layoutX="296.0" layoutY="13.0" onAction="#selectMediaBtnOnAction" prefHeight="27.0" prefWidth="90.0" style="-fx-border-color: black; -fx-border-radius: 8;" text="Select Media" />
+                  <ImageView fitHeight="19.0" fitWidth="129.0" layoutX="135.0" layoutY="98.0">
+                     <image>
+                        <Image url="@../img/JMuisc-logo.png" />
+                     </image>
+                  </ImageView>
                   <ScrollPane fx:id="listScrollPane" layoutX="21.0" layoutY="44.0" prefHeight="408.0" prefWidth="356.0" style="-fx-background-color: gold;" visible="false">
                      <content>
                         <VBox fx:id="listVBox" prefHeight="406.0" prefWidth="354.0" style="-fx-background-color: transparent;" />
