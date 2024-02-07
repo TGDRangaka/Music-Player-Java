@@ -99,17 +99,17 @@
                         </ImageView>
                      </graphic>
                   </JFXButton>
-                  <ScrollPane fx:id="listScrollPane" layoutX="21.0" layoutY="44.0" prefHeight="408.0" prefWidth="356.0" style="-fx-background-color: gold;" visible="false">
-                     <content>
-                        <VBox fx:id="listVBox" prefHeight="406.0" prefWidth="354.0" style="-fx-background-color: transparent;" />
-                     </content>
-                  </ScrollPane>
                   <JFXButton layoutX="296.0" layoutY="13.0" onAction="#selectMediaBtnOnAction" prefHeight="27.0" prefWidth="90.0" style="-fx-border-color: black; -fx-border-radius: 8;" text="Select Media" />
                   <ImageView fitHeight="19.0" fitWidth="129.0" layoutX="135.0" layoutY="98.0">
                      <image>
                         <Image url="@../img/JMuisc-logo.png" />
                      </image>
                   </ImageView>
+                  <ScrollPane fx:id="listScrollPane" layoutX="21.0" layoutY="44.0" prefHeight="408.0" prefWidth="356.0" style="-fx-background-color: gold;" visible="false">
+                     <content>
+                        <VBox fx:id="listVBox" prefHeight="406.0" prefWidth="354.0" style="-fx-background-color: transparent;" />
+                     </content>
+                  </ScrollPane>
                </children>
             </Pane>
          </top>
