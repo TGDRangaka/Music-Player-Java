@@ -1,0 +1,23 @@
+.slider {
+    -fx-padding: 0 4px; /* Remove padding */
+}
+
+.slider .track {
+    -fx-border-color: black;
+    -fx-border-radius: 5px;
+    -fx-background-color: #ffffff; /* Track background color */
+}
+
+.slider .thumb {
+    -fx-background-color: #000000; /* Thumb color */
+    -fx-background-insets: 0, 1, 2; /* Remove shadow */
+    -fx-background-radius: 50%; /* Remove rounded corners */
+}
+
+.slider .thumb:hover {
+    -fx-background-color: #083c5e; /* Thumb color on hover */
+}
+
+.slider .thumb:pressed {
+    -fx-background-color: #00baf8; /* Thumb color when pressed */
+}
