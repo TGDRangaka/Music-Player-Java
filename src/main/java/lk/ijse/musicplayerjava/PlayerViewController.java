@@ -204,6 +204,7 @@ public class PlayerViewController implements Initializable {
             btn.setOnAction(e -> {
                 setAudioToPlayer(audioPaths.get(indx));
                 listBtnOnAction(new ActionEvent());
+                index = indx;
             });
 
             listVBox.getChildren().add(btn);
